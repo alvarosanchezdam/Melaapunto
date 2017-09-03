@@ -1,6 +1,7 @@
 package duran.sanchez.alvaro.melaapunto;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Environment;
 import android.support.design.widget.TabLayout;
@@ -26,8 +27,16 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
+
+import duran.sanchez.alvaro.melaapunto.model.Pelicula;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -45,11 +54,17 @@ public class MainActivity extends AppCompatActivity {
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
+    private FloatingActionButton addButton;
 
+    private File f;
+    private List<Pelicula> peliculaList = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        addButton = (FloatingActionButton) findViewById(R.id.fab);
+        peliculaList.add(new Pelicula(5, "a", 0, "aa", "dd", true, 0, null));
+        peliculaList.add(new Pelicula(6, "45", 5, "45", "45", true, 1, null));
         boolean hasPermission = (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
         if (!hasPermission) {
@@ -58,16 +73,7 @@ public class MainActivity extends AppCompatActivity {
                     REQUEST_WRITE_STORAGE);
             Log.d("prueba", "error no hay permiso");
         }
-        File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/melaapunto/");
-        if(!dir.exists()){
-            dir.mkdir();
-            File f = new File(dir, "peliculas.txt");
-            try {
-                f.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
@@ -89,9 +95,42 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+        File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/melaapunto/");
+        if(!dir.exists()){
+            dir.mkdir();
+            f = new File(dir, "peliculas.txt");
+            try {
+                f.createNewFile();
+                Gson gson = new Gson();
+                String pelis = gson.toJson(peliculaList);
+                montarFile(pelis);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
+        }
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, AddFilmActivity.class);
+                startActivity(intent);
+            }
+        });
     }
-
+    private void montarFile(String peliculas) {
+        //Me aseguro que la descarga no llega vacia, si es asi no la guardo en el fichero
+        if (!peliculas.equals("")) {
+            PrintWriter wr = null;
+            try {
+                //Escribo la descarga en el fichero creado
+                wr = new PrintWriter(f);
+                wr.println(peliculas);
+                wr.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

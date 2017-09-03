@@ -1,5 +1,7 @@
 package duran.sanchez.alvaro.melaapunto.model;
 
+import android.net.Uri;
+
 /**
  * Created by Álvaro on 07/08/2017.
  */
@@ -11,17 +13,20 @@ public class Pelicula {
     private String descripción;
     private String recomendadaPor;
     private boolean vista;
-
+    private int tag;
+    private String imagePath;
     public Pelicula() {
     }
 
-    public Pelicula(int id, String titulo, int nota, String descripción, String recomendadaPor, boolean vista) {
+    public Pelicula(int id, String titulo, int nota, String descripción, String recomendadaPor, boolean vista, int tag, String imagePath) {
         this.id = id;
         this.titulo = titulo;
         this.nota = nota;
         this.descripción = descripción;
         this.recomendadaPor = recomendadaPor;
         this.vista = vista;
+        this.tag = tag;
+        this.imagePath = imagePath;
     }
 
     public int getId() {
@@ -70,5 +75,21 @@ public class Pelicula {
 
     public void setVista(boolean vista) {
         this.vista = vista;
+    }
+
+    public int getTag() {
+        return tag;
+    }
+
+    public void setTag(int tag) {
+        this.tag = tag;
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 }
